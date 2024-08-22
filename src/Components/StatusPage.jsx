@@ -1,5 +1,95 @@
 import { useState, useEffect } from "react";
-import { Box, Heading, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Button, Spinner, Alert, AlertIcon, Input, FormControl, FormLabel, Select, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure } from "@chakra-ui/react";
+import { Select, VStack, Box, Button, Table, Thead, Tbody, Tr, Th, Td, useToast, Heading, TableContainer, Spinner, Alert, AlertIcon, Input, FormControl, FormLabel, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, ChakraProvider } from "@chakra-ui/react";
+
+// Error Management Component
+const ErrorManagement = () => {
+  const [errors, setErrors] = useState([]);
+  const toast = useToast();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchErrorHistory();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchErrorHistory = async () => {
+    try {
+      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/errorHistory`);
+      const data = await response.json();
+      setErrors(data);
+    } catch (err) {
+      console.error("Error fetching error history:", err);
+    }
+  };
+
+  const resolveError = async (errorId) => {
+    try {
+      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/errorsolve`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ErrorId: errorId }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Error resolved",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        fetchErrorHistory();
+      } else {
+        console.error("Error resolving error:", response.statusText);
+      }
+    } catch (err) {
+      console.error("Error resolving error:", err);
+    }
+  };
+
+  return (
+    <Box p={4} borderWidth={1} borderRadius="md" shadow="md" bg="white">
+      <Heading as="h2" size="lg" mb={4} textAlign="center">
+        Error Management
+      </Heading>
+      <TableContainer>
+        <Table variant="simple">
+          <Thead bg="gray.100">
+            <Tr>
+              <Th>Error ID</Th>
+              <Th>Description</Th>
+              <Th>From Where</Th>
+              <Th>Reported Time</Th>
+              <Th>Is Solved</Th>
+              <Th>Actions</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {errors.map((error) => (
+              <Tr key={error.ErrorId}>
+                <Td>{error.ErrorId}</Td>
+                <Td>{error.Description}</Td>
+                <Td>{error.FromWhere}</Td>
+                <Td>{new Date(error.ReportedTime).toLocaleString()}</Td>
+                <Td>{error.IsSolved ? "Yes" : "No"}</Td>
+                <Td>
+                  {!error.IsSolved && (
+                    <Button colorScheme="teal" onClick={() => resolveError(error.ErrorId)}>
+                      Resolve
+                    </Button>
+                  )}
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </Box>
+  );
+};
 
 const Rooms = () => {
   const [rooms, setRooms] = useState([]);
@@ -13,7 +103,6 @@ const Rooms = () => {
     memberCount: 1,
     status: "",
     startTime: "",
-    ChallengeId: "",
   });
   const [actionType, setActionType] = useState(""); // Track current action (update or delete)
 
@@ -44,10 +133,10 @@ const Rooms = () => {
     return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
-  const handleRoomSelect = (ChallengeId) => {
-    const room = rooms.find((r) => r.ChallengeId === ChallengeId);
+  const handleRoomSelect = (GroupId) => {
+    const room = rooms.find((r) => r.GroupId === GroupId);
     if (room) {
-      setselectedGroup(ChallengeId);
+      setselectedGroup(GroupId);
       setFormData({
         GroupName: room.GroupName,
         GroupId: room.GroupId,
@@ -55,7 +144,6 @@ const Rooms = () => {
         memberCount: room.MemberCount,
         status: room.Status,
         startTime: room.StartTime,
-        ChallengeId: room.ChallengeId,
       });
       onEditOpen(); // Open the edit modal when a room is selected
     }
@@ -100,7 +188,7 @@ const Rooms = () => {
       setselectedGroup(null);
       setFormData({
         GroupName: "",
-        ChallengeId: "",
+        GroupId: "",
         difficulty: 1,
         memberCount: 1,
         status: "",
@@ -113,7 +201,7 @@ const Rooms = () => {
       setselectedGroup(null);
       setFormData({
         GroupName: "",
-        ChallengeId: "",
+        GroupId: "",
         difficulty: 1,
         memberCount: 1,
         status: "",
@@ -147,7 +235,7 @@ const Rooms = () => {
   };
 
   return (
-    <Box p={5}>
+    <Box p={4} borderWidth={1} borderRadius="md" shadow="md" bg="white">
       <Heading mb={4}>Rooms</Heading>
       {loading && <Spinner size="xl" />}
       {error && (
@@ -157,18 +245,17 @@ const Rooms = () => {
         </Alert>
       )}
       {!loading && !error && (
-        <TableContainer overflowX="auto">
-          <Table variant="simple" size={"sm"}>
-            <Thead>
+        <TableContainer>
+          <Table variant="simple">
+            <Thead bg="gray.100">
               <Tr>
-                <Th>ルームID</Th>
-                <Th>グループ名</Th>
-                <Th>グループID</Th>
-                <Th>難易度</Th>
-                <Th>人数</Th>
-                <Th>状況</Th>
-                <Th>登録時刻</Th>
-                <Th>挑戦ID</Th>
+                <Th>Room ID</Th>
+                <Th>Group Name</Th>
+                <Th>Group ID</Th>
+                <Th>Difficulty</Th>
+                <Th>Member Count</Th>
+                <Th>Status</Th>
+                <Th>Start Time</Th>
                 <Th>Actions</Th>
               </Tr>
             </Thead>
@@ -182,12 +269,11 @@ const Rooms = () => {
                   <Td>{room.MemberCount}</Td>
                   <Td>{room.Status}</Td>
                   <Td>{new Date(room.StartTime).toLocaleString({ timeZone: "Asia/Tokyo" })}</Td>
-                  <Td>{room.ChallengeId}</Td>
                   <Td>
-                    <Button onClick={() => handleRoomSelect(room.ChallengeId)}>Edit</Button>
+                    <Button onClick={() => handleRoomSelect(room.GroupId)}>Edit</Button>
                     <Button
                       onClick={() => {
-                        setselectedGroup(room.ChallengeId);
+                        setselectedGroup(room.GroupId);
                         setActionType("delete");
                         onConfirmOpen();
                       }}
@@ -209,6 +295,14 @@ const Rooms = () => {
           <ModalHeader>Edit Room</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <FormControl mb={4}>
+              <FormLabel>Group Name</FormLabel>
+              <Input name="GroupName" value={formData.GroupName} onChange={handleInputChange} />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel>Group ID</FormLabel>
+              <Input name="GroupId" value={formData.GroupId} onChange={handleInputChange} />
+            </FormControl>
             <FormControl mb={4}>
               <FormLabel>Difficulty</FormLabel>
               <Select name="difficulty" value={formData.difficulty} onChange={handleInputChange}>
@@ -267,5 +361,14 @@ const Rooms = () => {
     </Box>
   );
 };
+// Main App Component
+const App = () => (
+  <ChakraProvider>
+    <VStack spacing={8} align="stretch" p={4}>
+      <ErrorManagement />
+      <Rooms />
+    </VStack>
+  </ChakraProvider>
+);
 
-export default Rooms;
+export default App;
