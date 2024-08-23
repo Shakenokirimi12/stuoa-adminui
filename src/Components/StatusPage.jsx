@@ -16,7 +16,7 @@ const ErrorManagement = () => {
 
   const fetchErrorHistory = async () => {
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/errorHistory`);
+      const response = await fetch(`http://${window.location.host}/api/adminui/errorHistory`);
       const data = await response.json();
       setErrors(data);
     } catch (err) {
@@ -26,7 +26,7 @@ const ErrorManagement = () => {
 
   const resolveError = async (errorId) => {
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/errorsolve`, {
+      const response = await fetch(`http://${window.location.host}/api/adminui/errorsolve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -111,7 +111,7 @@ const Rooms = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/rooms/list`);
+      const response = await fetch(`http://${window.location.host}/api/adminui/rooms/list`);
       const result = await response.json();
 
       if (response.ok) {
@@ -157,7 +157,7 @@ const Rooms = () => {
   const handleUpdate = async () => {
     if (!selectedGroup) return;
 
-    const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/rooms/update/${selectedGroup}`, {
+    const response = await fetch(`http://${window.location.host}/api/adminui/rooms/update/${selectedGroup}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
@@ -177,7 +177,7 @@ const Rooms = () => {
   const handleDelete = async () => {
     if (!selectedGroup) return;
 
-    const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/rooms/delete/${selectedGroup}`, {
+    const response = await fetch(`http://${window.location.host}/api/adminui/rooms/delete/${selectedGroup}`, {
       method: "DELETE",
     });
 

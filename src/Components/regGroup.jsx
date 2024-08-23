@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Box, Input, Button, FormControl, FormLabel, ChakraProvider, VStack, Heading, Alert, AlertIcon, Select, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Text} from "@chakra-ui/react";
+import { Box, Input, Button, FormControl, FormLabel, ChakraProvider, VStack, Heading, Alert, AlertIcon, Select, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Text } from "@chakra-ui/react";
 import { NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from "@chakra-ui/react";
+import Rooms from "./Rooms";
 
 const GroupRegistrationForm = () => {
   const [groupname, setGroupname] = useState("");
@@ -18,7 +19,7 @@ const GroupRegistrationForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/regChallenge`, {
+      const response = await fetch(`http://${window.location.host}/api/adminui/regChallenge`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,6 +139,7 @@ const GroupRegistrationForm = () => {
           </ModalContent>
         </Modal>
       </Box>
+      <Rooms />
     </ChakraProvider>
   );
 };

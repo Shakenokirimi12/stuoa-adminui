@@ -8,6 +8,8 @@ import Rooms from './Components/Rooms';
 import ErrorManagementPage from './Components/ErrorManagementPage';
 import ErrorHandler from './Components/ErrorHandler'; // Import ErrorHandler
 import StatusPage from './Components/StatusPage';
+import Stats from './Components/Stats';
+import GroupList from './Components/ExitMenu';
 
 function App() {
   return (
@@ -18,12 +20,14 @@ function App() {
         <BrowserRouter>
           <div className="App">
             <Routes>
-              <Route path="/" element={<StatusPage />} />
-              <Route path="/Home" element={<StatusPage />} />
-              <Route path="/Register" element={<GroupRegistrationForm />} />
-              <Route path="/Rooms" element={<Rooms />} />
-              <Route path="/Errors" element={<ErrorManagementPage />} />
-              <Route path="/*" element={<NotFoundPage />} />
+              <Route path="/adminui" element={<StatusPage />} />
+              <Route path="/adminui/Home" element={<StatusPage />} />
+              <Route path="/adminui/Stats" element={<Stats />} />
+              <Route path="/adminui/Register" element={<GroupRegistrationForm />} />
+              <Route path="/adminui/Rooms" element={<Rooms />} />
+              <Route path="/adminui/Errors" element={<ErrorManagementPage />} />
+              <Route path="/adminui/ExitMenu" element={<GroupList />} />
+              <Route path="/adminui/*" element={<NotFoundPage />} />
             </Routes>
             {/* <Footer /> */}
           </div>

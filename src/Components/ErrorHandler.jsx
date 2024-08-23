@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { Box, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, useBreakpointValue } from "@chakra-ui/react";
+import { Box, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, useBreakpointValue, Text } from "@chakra-ui/react";
 
 const fetchUnresolvedErrors = async (onOpen, setCurrentError) => {
   try {
-    const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/errorcheck`);
+    const response = await fetch(`http://${window.location.host}/api/adminui/errorcheck`);
     const data = await response.json();
     if (data.length > 0) {
       setCurrentError(data[0]);
@@ -31,7 +31,7 @@ const ErrorHandler = () => {
 
   const resolveError = async (errorId) => {
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/errorsolve`, {
+      const response = await fetch(`http://${window.location.host}/api/adminui/errorsolve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,29 +55,31 @@ const ErrorHandler = () => {
         <Modal isOpen={isOpen} onClose={onClose} isCentered closeOnOverlayClick={false} closeOnEsc={false} size={size}>
           <ModalOverlay />
           <ModalContent maxW="90vw" maxH="90vh" p={6} borderRadius="md" boxShadow="lg">
-            <ModalHeader fontSize="2xl">Error Detected</ModalHeader>
+            <ModalHeader fontSize="2xl" color={"red"}>
+              エラーが発生しました。
+            </ModalHeader>
             <ModalBody>
               <Box>
-                <p>
-                  <strong>Error ID:</strong> {currentError.ErrorId}
-                </p>
-                <p>
-                  <strong>Description:</strong> {currentError.Description}
-                </p>
-                <p>
-                  <strong>From Where:</strong> {currentError.FromWhere}
-                </p>
-                <p>
-                  <strong>Reported Time:</strong> {currentError.ReportedTime}
-                </p>
+                <Text fontSize="xl">
+                  <strong>エラーID:</strong> {currentError.ErrorId}
+                </Text>
+                <Text fontSize="xl">
+                  <strong>内容:</strong> {currentError.Description}
+                </Text>
+                <Text fontSize="xl">
+                  <strong>場所:</strong> {currentError.FromWhere}
+                </Text>
+                <Text fontSize="xl">
+                  <strong>発生日時:</strong> {currentError.ReportedTime}
+                </Text>
               </Box>
             </ModalBody>
             <ModalFooter>
               <Button colorScheme="red" mr={3} onClick={onClose}>
-                Ignore
+                無視する
               </Button>
               <Button colorScheme="green" onClick={() => resolveError(currentError.ErrorId)}>
-                Resolve
+                解決する
               </Button>
             </ModalFooter>
           </ModalContent>

@@ -18,7 +18,7 @@ const ErrorManagementPage = () => {
   // Fetch the error history
   const fetchErrorHistory = async () => {
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/errorHistory`);
+      const response = await fetch(`http://${window.location.host}/api/adminui/errorHistory`);
       const data = await response.json();
       setErrors(data);
     } catch (err) {
@@ -32,7 +32,7 @@ const ErrorManagementPage = () => {
 
   const resolveError = async (errorId) => {
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/errorsolve`, {
+      const response = await fetch(`http://${window.location.host}/api/adminui/errorsolve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,12 +61,12 @@ const ErrorManagementPage = () => {
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>Error ID</Th>
-            <Th>Description</Th>
-            <Th>From Where</Th>
-            <Th>Reported Time</Th>
-            <Th>Is Solved</Th>
-            <Th>Actions</Th>
+            <Th>エラーID</Th>
+            <Th>内容</Th>
+            <Th>場所</Th>
+            <Th>発生日時</Th>
+            <Th>解決済み？</Th>
+            <Th>操作</Th>
           </Tr>
         </Thead>
         <Tbody>

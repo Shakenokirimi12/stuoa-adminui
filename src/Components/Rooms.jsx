@@ -22,7 +22,7 @@ const Rooms = () => {
 
   const fetchRooms = async () => {
     try {
-      const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/rooms/list`);
+      const response = await fetch(`http://${window.location.host}/api/adminui/rooms/list`);
       const result = await response.json();
 
       if (response.ok) {
@@ -69,7 +69,7 @@ const Rooms = () => {
   const handleUpdate = async () => {
     if (!selectedGroup) return;
 
-    const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/rooms/update/${selectedGroup}`, {
+    const response = await fetch(`http://${window.location.host}/api/adminui/rooms/update/${selectedGroup}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
@@ -89,7 +89,7 @@ const Rooms = () => {
   const handleDelete = async () => {
     if (!selectedGroup) return;
 
-    const response = await fetch(`http://${process.env.REACT_APP_API_IP}/api/adminui/rooms/delete/${selectedGroup}`, {
+    const response = await fetch(`http://${window.location.host}/api/adminui/rooms/delete/${selectedGroup}`, {
       method: "DELETE",
     });
 
@@ -168,8 +168,8 @@ const Rooms = () => {
                 <Th>人数</Th>
                 <Th>状況</Th>
                 <Th>登録時刻</Th>
-                <Th>挑戦ID</Th>
-                <Th>Actions</Th>
+                <Th>チャレンジID</Th>
+                <Th>操作</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -184,7 +184,7 @@ const Rooms = () => {
                   <Td>{new Date(room.StartTime).toLocaleString({ timeZone: "Asia/Tokyo" })}</Td>
                   <Td>{room.ChallengeId}</Td>
                   <Td>
-                    <Button onClick={() => handleRoomSelect(room.ChallengeId)}>Edit</Button>
+                    <Button onClick={() => handleRoomSelect(room.ChallengeId)}>変更</Button>
                     <Button
                       onClick={() => {
                         setselectedGroup(room.ChallengeId);
@@ -194,7 +194,7 @@ const Rooms = () => {
                       colorScheme="red"
                       ml={2}
                     >
-                      Delete
+                      削除
                     </Button>
                   </Td>
                 </Tr>
