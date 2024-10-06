@@ -12,6 +12,7 @@ import Stats from './Components/Stats';
 import GroupList from './Components/ExitMenu';
 import RoomStatus from './Components/roomStatus';
 import Rankings from './Components/Rankings';
+import AvailableRoomHandler from './Components/RoomGuidanceHandler';
 
 const App = () => {
   const location = useLocation();
@@ -20,6 +21,7 @@ const App = () => {
   return (
     <div className="App">
       {showNav && <Nav />}
+      {showNav && <AvailableRoomHandler />}
       {showNav && <ErrorHandler />}
       <Routes>
         <Route path="/adminui" element={<StatusPage />} />

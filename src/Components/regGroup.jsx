@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Input, Button, FormControl, FormLabel, ChakraProvider, VStack, Heading, Alert, AlertIcon, Select, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Text } from "@chakra-ui/react";
+import { Box, Input, Button, FormControl, FormLabel, ChakraProvider, VStack, Heading, Alert, AlertIcon, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Text } from "@chakra-ui/react";
 import { NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from "@chakra-ui/react";
 import Rooms from "./Rooms";
 
@@ -8,9 +8,10 @@ const GroupRegistrationForm = () => {
   const [message, setMessage] = useState("");
   const [playerCount, setPlayerCount] = useState(1);
   const [difficulty, setDifficulty] = useState(1);
-  const [roomId, setRoomId] = useState("");
   const [messageType, setMessageType] = useState("");
   const [dupCheckValue, setDupCheckValue] = useState(false);
+  const [queue_number, setQueueNumber] = useState("");
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const handlePlayerCountChange = (value) => setPlayerCount(value);
@@ -19,17 +20,17 @@ const GroupRegistrationForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch(`http://${window.location.host}/api/adminui/regChallenge`, {
+      const response = await fetch(`http://${window.location.host}/api/adminui/regChallenge/auto`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          roomID: roomId,
           GroupName: groupname,
           playerCount: playerCount,
           difficulty: difficulty,
           dupCheck: dupCheckValue,
+          queueNumber: queue_number,
         }),
       });
 
@@ -46,7 +47,6 @@ const GroupRegistrationForm = () => {
 
       if (result.success) {
         setGroupname("");
-        setRoomId("");
         setPlayerCount(1);
         setDifficulty(1);
         setDupCheckValue(false);
@@ -107,12 +107,8 @@ const GroupRegistrationForm = () => {
               </NumberInput>
             </FormControl>
             <FormControl isRequired>
-              <FormLabel>ルームID</FormLabel>
-              <Select placeholder="ルームIDを選択" value={roomId} onChange={(e) => setRoomId(e.target.value)}>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-              </Select>
+              <FormLabel>整理番号</FormLabel>
+              <Input type="text" value={queue_number} onChange={(e) => setQueueNumber(e.target.value)} />
             </FormControl>
             <Button colorScheme="teal" type="submit">
               登録
