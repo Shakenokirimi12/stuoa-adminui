@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Box, Input, Button, FormControl, FormLabel, ChakraProvider, VStack, Heading, Alert, AlertIcon, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Text } from "@chakra-ui/react";
 import { NumberInput, NumberInputField, NumberInputStepper, NumberIncrementStepper, NumberDecrementStepper } from "@chakra-ui/react";
 import Rooms from "./Rooms";
@@ -9,15 +9,21 @@ const GroupRegistrationForm = () => {
   const [playerCount, setPlayerCount] = useState(1);
   const [difficulty, setDifficulty] = useState(1);
   const [messageType, setMessageType] = useState("");
-  const [dupCheckValue, setDupCheckValue] = useState(false);
   const [queue_number, setQueueNumber] = useState("");
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const queueNumberInputRef = useRef(null); // Add reference to the queue number input
 
   const handlePlayerCountChange = (value) => setPlayerCount(value);
   const handleDifficultyChange = (value) => setDifficulty(value);
 
-  const handleSubmit = async (event) => {
+  useEffect(() => {
+    if (!queue_number && queueNumberInputRef.current) {
+      queueNumberInputRef.current.focus(); // Focus on the queue number input if it's empty
+    }
+  }, [queue_number]);
+
+  const handleSubmit = async (event, dupCheck = false) => {
     event.preventDefault();
     try {
       const response = await fetch(`http://${window.location.host}/api/adminui/regChallenge/auto`, {
@@ -29,7 +35,7 @@ const GroupRegistrationForm = () => {
           GroupName: groupname,
           playerCount: playerCount,
           difficulty: difficulty,
-          dupCheck: dupCheckValue,
+          dupCheck: dupCheck,
           queueNumber: queue_number,
         }),
       });
@@ -49,30 +55,29 @@ const GroupRegistrationForm = () => {
         setGroupname("");
         setPlayerCount(1);
         setDifficulty(1);
-        setDupCheckValue(false);
+        setQueueNumber("");
       }
 
-      setTimeout(() => setMessage(""), 5000);
+      setTimeout(() => setMessage(""), 3000);
     } catch (error) {
       console.error("Error:", error);
       setMessage("An unexpected error occurred.");
       setMessageType("error");
-      setDupCheckValue(false);
       setTimeout(() => setMessage(""), 5000);
     }
   };
 
   const handleRetry = () => {
-    setDupCheckValue(true);
-    onClose();
-    handleSubmit(new Event("submit"));
+    handleSubmit(new Event("submit"), true).then(() => {
+      onClose();
+    });
   };
 
   return (
     <ChakraProvider>
       <Box maxW="md" mx="auto" mt={10} p={6} borderWidth={1} borderRadius="lg" boxShadow="lg">
         <Heading as="h1" size="lg" mb={6} textAlign="center">
-          開始処理
+          開始登録
         </Heading>
         {message && (
           <Alert status={messageType} mb={6}>
@@ -82,6 +87,15 @@ const GroupRegistrationForm = () => {
         )}
         <Box as="form" onSubmit={handleSubmit}>
           <VStack spacing={4}>
+            <FormControl isRequired>
+              <FormLabel>整理番号</FormLabel>
+              <Input
+                ref={queueNumberInputRef} // Attach the reference to the input field
+                type="text"
+                value={queue_number}
+                onChange={(e) => setQueueNumber(e.target.value)}
+              />
+            </FormControl>
             <FormControl isRequired>
               <FormLabel>グループ名・ハンドルネーム</FormLabel>
               <Input type="text" value={groupname} onChange={(e) => setGroupname(e.target.value)} />
@@ -105,10 +119,6 @@ const GroupRegistrationForm = () => {
                   <NumberDecrementStepper />
                 </NumberInputStepper>
               </NumberInput>
-            </FormControl>
-            <FormControl isRequired>
-              <FormLabel>整理番号</FormLabel>
-              <Input type="text" value={queue_number} onChange={(e) => setQueueNumber(e.target.value)} />
             </FormControl>
             <Button colorScheme="teal" type="submit">
               登録
